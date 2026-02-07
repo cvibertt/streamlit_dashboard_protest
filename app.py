@@ -89,6 +89,9 @@ def load_data() -> pd.DataFrame:
     # Clean participants for numeric analysis
     df["participants_numeric"] = pd.to_numeric(df["participants"], errors="coerce")
 
+    # Ensure participants is a uniform string type (avoids Arrow serialization errors)
+    df["participants"] = df["participants"].astype(str).replace("nan", None)
+
     # Ensure protesterviolence is clean
     df["protesterviolence"] = df["protesterviolence"].fillna(0).astype(int)
     df["violence_label"] = df["protesterviolence"].map({0: "Peaceful", 1: "Violent"})
@@ -224,7 +227,7 @@ with col_a:
         margin=dict(l=20, r=20, t=10, b=60),
         height=380,
     )
-    st.plotly_chart(fig_time, use_container_width=True)
+    st.plotly_chart(fig_time, key="fig_time")
 
 with col_b:
     st.subheader("Protests by Region")
@@ -244,7 +247,7 @@ with col_b:
         margin=dict(l=20, r=20, t=10, b=10),
         height=380,
     )
-    st.plotly_chart(fig_region, use_container_width=True)
+    st.plotly_chart(fig_region, key="fig_region")
 
 # ---------------------------------------------------------------------------
 # Row 2: Top countries  |  Protester demands
@@ -276,7 +279,7 @@ with col_c:
         margin=dict(l=20, r=20, t=10, b=20),
         height=440,
     )
-    st.plotly_chart(fig_countries, use_container_width=True)
+    st.plotly_chart(fig_countries, key="fig_countries")
 
 with col_d:
     st.subheader("Protester Demands")
@@ -303,7 +306,7 @@ with col_d:
         margin=dict(l=20, r=20, t=10, b=20),
         height=440,
     )
-    st.plotly_chart(fig_demand, use_container_width=True)
+    st.plotly_chart(fig_demand, key="fig_demand")
 
 # ---------------------------------------------------------------------------
 # Row 3: State response  |  Violence breakdown
@@ -333,7 +336,7 @@ with col_e:
         margin=dict(l=20, r=20, t=10, b=20),
         height=380,
     )
-    st.plotly_chart(fig_resp, use_container_width=True)
+    st.plotly_chart(fig_resp, key="fig_resp")
 
 with col_f:
     st.subheader("Protester Violence")
@@ -354,7 +357,7 @@ with col_f:
         margin=dict(l=20, r=20, t=10, b=10),
         height=380,
     )
-    st.plotly_chart(fig_viol, use_container_width=True)
+    st.plotly_chart(fig_viol, key="fig_viol")
 
 # ---------------------------------------------------------------------------
 # Row 4: Violence trend  |  Participants distribution
@@ -382,7 +385,7 @@ with col_g:
         margin=dict(l=20, r=20, t=10, b=20),
         height=380,
     )
-    st.plotly_chart(fig_vtrend, use_container_width=True)
+    st.plotly_chart(fig_vtrend, key="fig_vtrend")
 
 with col_h:
     st.subheader("Participant Size Distribution")
@@ -409,7 +412,7 @@ with col_h:
         margin=dict(l=20, r=20, t=10, b=20),
         height=380,
     )
-    st.plotly_chart(fig_cat, use_container_width=True)
+    st.plotly_chart(fig_cat, key="fig_cat")
 
 # ---------------------------------------------------------------------------
 # Row 5: Country x Year heatmap
@@ -439,7 +442,7 @@ fig_heat.update_layout(
     margin=dict(l=20, r=20, t=10, b=20),
     height=max(350, top_n * 28),
 )
-st.plotly_chart(fig_heat, use_container_width=True)
+st.plotly_chart(fig_heat, key="fig_heat")
 
 # ---------------------------------------------------------------------------
 # Row 6: Demand breakdown by region (stacked bar)
@@ -466,7 +469,7 @@ fig_dr.update_layout(
     margin=dict(l=20, r=20, t=10, b=80),
     height=420,
 )
-st.plotly_chart(fig_dr, use_container_width=True)
+st.plotly_chart(fig_dr, key="fig_dr")
 
 # ---------------------------------------------------------------------------
 # Data table
@@ -488,7 +491,6 @@ display_cols = [
 ]
 st.dataframe(
     filtered[display_cols].sort_values("start_date", ascending=False).reset_index(drop=True),
-    use_container_width=True,
     height=460,
 )
 
